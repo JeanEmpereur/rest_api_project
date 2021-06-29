@@ -23,7 +23,7 @@ class PetsController extends AbstractFOSRestController
   {
     $repository = $this->getDoctrine()->getRepository(Pets::class);
     $pets = $repository->findall();
-    return $this->handleView($this->view($pets));
+    return $this->handleView($this->view($pets, 200));
   }
   /**
    * Get one pet.
@@ -81,4 +81,36 @@ class PetsController extends AbstractFOSRestController
 
     return $this->handleView($this->view(['status' => 'ok'], Response::HTTP_OK));
   }
+
+  /**
+   * Home page.
+   * @Rest\Get("/home")
+   *
+   * 
+   * @return Response
+   */
+  public function getRandomPets()
+   {
+        $em = $this->getDoctrine()->getManager();
+        $repo = $em->getRepository(Pets::class);
+        $quantity = 5; // We only want 5 rows (however think in increase this value if you have previously removed rows on the table)
+
+        // This is the number of rows in the database
+        // You can use another method according to your needs
+        $totalRowsTable = $repo->createQueryBuilder()->select('count(pets.id)')->getQuery()->getSingleScalarResult();// This will be in this case 10 because i have 10 records on this table
+        $numbers = range(1, $totalRowsTable);
+        shuffle($numbers);
+        $random_ids = array_slice($numbers, 0, $quantity);
+
+        // var_dump($random_ids);
+        // outputs for example:
+        // array(1,5,2,8,3);
+
+        $random_articles = $repo->createQueryBuilder()
+                    ->from('Pets')
+                    ->setParameter('id', $random_ids)
+                    ->setMaxResults(5)// Add this line if you want to give a limit to the records (if all the ids exists then you would like to give a limit)
+                    ->getQuery()
+                    ->getResult();
+    }
 }

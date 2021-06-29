@@ -43,8 +43,6 @@ class Product {
   {
     $this->id = $id;
   }
-
-
   /**
    * @return mixed
    */
@@ -59,9 +57,6 @@ class Product {
   {
     $this->prix = $prix;
   }
-
-
-
   /**
    * @return mixed
    */

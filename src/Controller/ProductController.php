@@ -26,17 +26,17 @@ class ProductController extends AbstractFOSRestController
     return $this->handleView($this->view($products));
   }
   /**
-   * Get one product.
-   * @Rest\Get("/products/{product}
+   * Get one pet.
+   * @Rest\Get("/product/{product}")
    *
    * @param Product $product
    * 
    * @return Response
    */
-   public function getProductbyID(Product $product)
-   {
-     return $this->handleView($this->view($product));
-   }
+  public function getProductbyID(Product $product)
+  {
+    return $this->handleView($this->view($product));
+  }
   /**
    * Create Product.
    * @Rest\Post("/product")
