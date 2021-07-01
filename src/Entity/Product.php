@@ -54,7 +54,7 @@ class Product {
    */
   public function getPrix()
   {
-    return $this->name;
+    return $this->prix;
   }
   /**
    * @param mixed $prix

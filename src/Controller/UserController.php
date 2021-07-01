@@ -23,10 +23,10 @@ class UserController extends AbstractFOSRestController
   {
     $repository = $this->getDoctrine()->getRepository(User::class);
     $users = $repository->findall();
-    return $this->handleView($this->view($users));
+    return $this->handleView($this->view($users, Response::HTTP_OK));
   }
   /**
-   * Get one pet.
+   * Get one user.
    * @Rest\Get("/user/{user}")
    *
    * @param User $user
@@ -35,7 +35,7 @@ class UserController extends AbstractFOSRestController
    */
   public function getUserbyID(User $user)
   {
-    return $this->handleView($this->view($user));
+    return $this->handleView($this->view($user, Response::HTTP_OK));
   }
   /**
    * Create User.
@@ -55,7 +55,28 @@ class UserController extends AbstractFOSRestController
       $em->flush();
       return $this->handleView($this->view(['status' => 'ok'], Response::HTTP_CREATED));
     }
-    return $this->handleView($this->view($form->getErrors()));
+    return $this->handleView($this->view($form->getErrors(), Response::HTTP_NOT_ACCEPTABLE));
+  }
+  /**
+   * Update User.
+   * @Rest\Put("/user/{user}")
+   *
+   * @param User $user
+   * 
+   * @return Response
+   */
+  public function putUserAction(Request $request, User $user)
+  {
+    $form = $this->createForm(UserType::class, $user);
+    $data = json_decode($request->getContent(), true);
+    $form->submit($data);
+    if ($form->isSubmitted() && $form->isValid()) {
+      $em = $this->getDoctrine()->getManager();
+      $em->persist($user);
+      $em->flush();
+      return $this->handleView($this->view(['status' => 'ok'], Response::HTTP_CREATED));
+    }
+    return $this->handleView($this->view($form, Response::HTTP_OK));
   }
   /**
    * Login
@@ -66,5 +87,14 @@ class UserController extends AbstractFOSRestController
   public function login(Request $request)
   {
     $data = json_decode($request->getContent(), true);
+    $username = $data['username'];
+    $password = $data['password'];
+
+    $em = $this->getDoctrine()->getManager();
+    $user = $em->getRepository(User::class)->findOneBy(array('username' => $username));
+    if ($user->getPassword() === $password) {
+      return $this->handleView($this->view($user, Response::HTTP_OK));
+    };
+    return $this->handleView($this->view(['status' => 'not ok'], Response::HTTP_NOT_ACCEPTABLE));
   }
 }

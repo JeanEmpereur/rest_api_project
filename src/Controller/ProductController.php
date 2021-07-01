@@ -23,19 +23,19 @@ class ProductController extends AbstractFOSRestController
   {
     $repository = $this->getDoctrine()->getRepository(Product::class);
     $products = $repository->findall();
-    return $this->handleView($this->view($products));
+    return $this->handleView($this->view($products, Response::HTTP_OK));
   }
   /**
-   * Get one pet.
+   * Get one product.
    * @Rest\Get("/product/{product}")
    *
    * @param Product $product
-   * 
+   *
    * @return Response
    */
   public function getProductbyID(Product $product)
   {
-    return $this->handleView($this->view($product));
+    return $this->handleView($this->view($product, Response::HTTP_OK));
   }
   /**
    * Create Product.
@@ -55,7 +55,28 @@ class ProductController extends AbstractFOSRestController
       $em->flush();
       return $this->handleView($this->view(['status' => 'ok'], Response::HTTP_CREATED));
     }
-    return $this->handleView($this->view($form->getErrors()));
+    return $this->handleView($this->view($form->getErrors(), Response::HTTP_NOT_ACCEPTABLE));
+  }
+  /**
+   * Update Product.
+   * @Rest\Put("/product/{product}")
+   *
+   * @param Product $product
+   *
+   * @return Response
+   */
+  public function putProductAction(Request $request, Product $product)
+  {
+    $form = $this->createForm(ProductType::class, $product);
+    $data = json_decode($request->getContent(), true);
+    $form->submit($data);
+    if ($form->isSubmitted() && $form->isValid()) {
+      $em = $this->getDoctrine()->getManager();
+      $em->persist($product);
+      $em->flush();
+      return $this->handleView($this->view(['status' => 'ok'], Response::HTTP_CREATED));
+    }
+    return $this->handleView($this->view($form), Response::HTTP_OK);
   }
   /**
    * Delete Product.
@@ -69,23 +90,22 @@ class ProductController extends AbstractFOSRestController
   {
 
     if (false === !!$product) {
-      return $this->handleView($this->view(['status' => 'not ok']));
+      return $this->handleView($this->view(['status' => 'not ok'], Response::HTTP_NOT_FOUND));
     }
     try {
       $em = $this->getDoctrine()->getManager();
       $em->remove($product);
       $em->flush();
     } catch (\Exception $exception) {
-      return $this->handleView($this->view(['status' => 'erreur dans la suppression']));
+      return $this->handleView($this->view(['status' => 'erreur dans la suppression'], Response::HTTP_NOT_MODIFIED));
     }
 
     return $this->handleView($this->view(['status' => 'ok'], Response::HTTP_OK));
   }
   /**
-   * Home page.
-   * @Rest\Get("/product/random")
+   * Get 5 Product Random
+   * @Rest\Get("/products/random")
    *
-   * 
    * @return Response
    */
   public function getRandomProduct()
@@ -95,9 +115,9 @@ class ProductController extends AbstractFOSRestController
     $quantity = 5;
 
     $products = $repo->findAll();
-    shuffle($pets);
+    shuffle($products);
     $products = array_slice($products, 0, $quantity);
 
-    return $this->handleView($this->view($products), 200);
+    return $this->handleView($this->view($products), Response::HTTP_OK);
   }
 }

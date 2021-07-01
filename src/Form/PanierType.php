@@ -15,8 +15,8 @@ class PanierType extends AbstractType
         $builder
             ->add('quantite')
             ->add('product')
-            //->add('createAt')
-            //->add('etat')
+            ->add('user')
+            ->add('etat')
             ->add('save', SubmitType::class)
         ;
     }

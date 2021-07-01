@@ -23,7 +23,7 @@ class ArticleController extends AbstractFOSRestController
   {
     $repository = $this->getDoctrine()->getRepository(Article::class);
     $articles = $repository->findall();
-    return $this->handleView($this->view($articles));
+    return $this->handleView($this->view($articles, Response::HTTP_OK));
   }
   /**
    * Get one article.
@@ -35,7 +35,7 @@ class ArticleController extends AbstractFOSRestController
    */
    public function getArticlebyID(Article $article)
    {
-     return $this->handleView($this->view($article));
+     return $this->handleView($this->view($article, Response::HTTP_OK));
    }
   /**
    * Create Article.
@@ -55,7 +55,28 @@ class ArticleController extends AbstractFOSRestController
       $em->flush();
       return $this->handleView($this->view(['status' => 'ok'], Response::HTTP_CREATED));
     }
-    return $this->handleView($this->view($form->getErrors()));
+    return $this->handleView($this->view($form->getErrors(), Response::HTTP_NOT_ACCEPTABLE));
+  }
+  /**
+   * Update Article.
+   * @Rest\Put("/article/{article}")
+   *
+   * @param Article $article
+   * 
+   * @return Response
+   */
+  public function putArticleAction(Request $request, Article $article)
+  {
+    $form = $this->createForm(ArticleType::class, $article);
+    $data = json_decode($request->getContent(), true);
+    $form->submit($data);
+    if ($form->isSubmitted() && $form->isValid()) {
+      $em = $this->getDoctrine()->getManager();
+      $em->persist($article);
+      $em->flush();
+      return $this->handleView($this->view(['status' => 'ok'], Response::HTTP_CREATED));
+    }
+    return $this->handleView($this->view($form));
   }
   /**
    * Delete Article.
@@ -69,14 +90,14 @@ class ArticleController extends AbstractFOSRestController
   {
 
     if (false === !!$article) {
-      return $this->handleView($this->view(['status' => 'not ok']));
+      return $this->handleView($this->view(['status' => ''], Response::HTTP_NOT_FOUND));
     }
     try {
       $em = $this->getDoctrine()->getManager();
       $em->remove($article);
       $em->flush();
     } catch (\Exception $exception) {
-      return $this->handleView($this->view(['status' => 'erreur dans la suppression']));
+      return $this->handleView($this->view(['status' => 'erreur dans la suppression'], Response::HTTP_NOT_MODIFIED));
     }
 
     return $this->handleView($this->view(['status' => 'ok'], Response::HTTP_OK));

@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\PanierRepository;
 use Doctrine\ORM\Mapping as ORM;
 use App\Entity\Product;
+use App\Entity\User;
 
 /**
  * @ORM\Entity
@@ -34,7 +35,11 @@ class Panier
      * @ORM\Column(type="datetime")
      */
     private $date_ajout;
-
+    /**
+     * @ORM\ManyToOne(targetEntity=user::class)
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $user;
     /**
      * @ORM\Column(type="boolean")
      */
@@ -59,6 +64,22 @@ class Panier
     public function setProduct($product)
     {
         $this->product = $product;
+
+        return $this;
+    }
+    /**
+     * @return User
+     */
+    public function getUser()
+    {
+        return $this->product;
+    }
+    /**
+     * @param User $user
+     */
+    public function setUser($user)
+    {
+        $this->user = $user;
 
         return $this;
     }

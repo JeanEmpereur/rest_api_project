@@ -23,10 +23,10 @@ class DonController extends AbstractFOSRestController
   {
     $repository = $this->getDoctrine()->getRepository(Don::class);
     $dons = $repository->findall();
-    return $this->handleView($this->view($dons));
+    return $this->handleView($this->view($dons, Response::HTTP_OK));
   }
   /**
-   * Get one pet.
+   * Get one Don.
    * @Rest\Get("/don/{don}")
    *
    * @param Don $don
@@ -35,7 +35,7 @@ class DonController extends AbstractFOSRestController
    */
   public function getDonbyID(Don $don)
   {
-    return $this->handleView($this->view($don));
+    return $this->handleView($this->view($don, Response::HTTP_OK));
   }
   /**
    * Create Don.
@@ -55,30 +55,6 @@ class DonController extends AbstractFOSRestController
       $em->flush();
       return $this->handleView($this->view(['status' => 'ok'], Response::HTTP_CREATED));
     }
-    return $this->handleView($this->view($form->getErrors()));
-  }
-  /**
-   * Delete Don.
-   * @Rest\Delete("/don/{don}")
-   *
-   * @param Don $don
-   *
-   * @return JsonResponse
-   */
-  public function deletePanier(Don $don)
-  {
-
-    if (false === !!$don) {
-      return $this->handleView($this->view(['status' => 'not ok']));
-    }
-    try {
-      $em = $this->getDoctrine()->getManager();
-      $em->remove($don);
-      $em->flush();
-    } catch (\Exception $exception) {
-      return $this->handleView($this->view(['status' => 'erreur dans la suppression']));
-    }
-
-    return $this->handleView($this->view(['status' => 'ok'], Response::HTTP_OK));
+    return $this->handleView($this->view($form->getErrors(), Response::HTTP_NOT_ACCEPTABLE));
   }
 }
