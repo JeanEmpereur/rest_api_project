@@ -7,6 +7,7 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\User;
 use App\Form\UserType;
+use Firebase\JWT\JWT;
 /**
  * User controller.
  * @Route("/api", name="api_")
@@ -93,7 +94,18 @@ class UserController extends AbstractFOSRestController
     $em = $this->getDoctrine()->getManager();
     $user = $em->getRepository(User::class)->findOneBy(array('username' => $username));
     if ($user->getPassword() === $password) {
-      return $this->handleView($this->view($user, Response::HTTP_OK));
+      $date = new \DateTime();
+      $date->add(new \DateInterval('P1D'));
+      $ts = $date->getTimestamp();
+      $key = "toto";
+      $payload = [
+        "id" => $user->getId(),
+        "email" => $user->getUsername(),
+        // "roles" => $user->getRole(),
+        "exp" => $ts
+      ];
+      $jwt = JWT::encode($payload, $key);
+      return $this->handleView($this->view($jwt, Response::HTTP_OK));
     };
     return $this->handleView($this->view(['status' => 'not ok'], Response::HTTP_NOT_ACCEPTABLE));
   }
