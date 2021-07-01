@@ -2,8 +2,10 @@
 namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Config\Framework\RateLimiter\LimiterConfig\RateConfig;
+
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="App\Repository\PetsRepository")
  * @ORM\Table(name="Pets")
  */
 class Pets {
@@ -30,6 +32,29 @@ class Pets {
    * @Assert\NotBlank()
    */
   private $adopter;
+  /**
+   * @ORM\Column(type="integer")
+   * @Assert\NotBlank()
+   *
+   */
+  private $poids;
+  /**
+   * @ORM\Column(type="string", length=100)
+   * @Assert\NotBlank()
+   *
+   */
+  private $race;
+  /**
+   * @ORM\Column(type="integer")
+   * @Assert\NotBlank()
+   *
+   */
+  private $age;
+  /**
+   * @ORM\Column(type="datetime", nullable=true)
+   *
+   */
+  private $date; 
   /**
    * @return mixed
    */
@@ -85,5 +110,61 @@ class Pets {
   public function setAdopter($adopter)
   {
     $this->adopter = $adopter;
+  }
+  /**
+   * @return mixed
+   */
+   public function getRace()
+   {
+     return $this->race;
+   }
+   /**
+    * @param mixed $race
+    */
+   public function setRace($race)
+   {
+     $this->race = $race;
+   }
+   /**
+   * @return mixed
+   */
+   public function getAge()
+   {
+     return $this->age;
+   }
+   /**
+    * @param mixed $age
+    */
+   public function setAge($age)
+   {
+     $this->age = $age;
+   }
+   /**
+   * @return mixed
+   */
+   public function getPoids()
+   {
+     return $this->poids;
+   }
+   /**
+    * @param mixed $poids
+    */
+   public function setPoids($poids)
+   {
+     $this->poids = $poids;
+   }
+  /**
+   * @return mixed
+   */
+  public function getDate()
+  {
+    return $this->date;
+  }
+  /**
+   * @param mixed $date
+   */
+  public function setDate($date)
+  {
+    $this->date = $date;
   }
 }

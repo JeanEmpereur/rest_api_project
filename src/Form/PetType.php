@@ -4,7 +4,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use App\Entity\Pet;
+use App\Entity\Pets;
 class PetType extends AbstractType
 {
   public function buildForm(FormBuilderInterface $builder, array $options)
@@ -13,13 +13,17 @@ class PetType extends AbstractType
       ->add('name')
       ->add('description')
       ->add('adopter')
+      ->add('poids')
+      ->add('race')
+      ->add('age')
+      ->add('date')
       ->add('save', SubmitType::class)
     ;
   }
   public function configureOptions(OptionsResolver $resolver)
   {
     $resolver->setDefaults(array(
-      'data_class' => Pet::class,
+      'data_class' => Pets::class,
       'csrf_protection' => false
     ));
   }

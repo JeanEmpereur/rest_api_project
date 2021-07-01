@@ -57,4 +57,14 @@ class UserController extends AbstractFOSRestController
     }
     return $this->handleView($this->view($form->getErrors()));
   }
+  /**
+   * Login
+   * @Rest\Post("/login")
+   * 
+   * @return Response
+   */
+  public function login(Request $request)
+  {
+    $data = json_decode($request->getContent(), true);
+  }
 }

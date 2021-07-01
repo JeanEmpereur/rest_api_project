@@ -2,8 +2,9 @@
 namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="App\Repository\ProductRepository")
  * @ORM\Table(name="Product")
  */
 class Product {
@@ -29,6 +30,11 @@ class Product {
    * @Assert\NotBlank()
    */
   private $description;
+  /**
+   * @ORM\Column(type="integer")
+   * @Assert\NotBlank()
+   */
+  private $stock;
   /**
    * @return mixed
    */
@@ -84,5 +90,19 @@ class Product {
   public function setDescription($description)
   {
     $this->description = $description;
+  }
+  /**
+   * @return mixed
+   */
+  public function getStock()
+  {
+    return $this->stock;
+  }
+  /**
+   * @param mixed $stock
+   */
+  public function setStock($stock)
+  {
+    $this->stock = $stock;
   }
 }

@@ -2,8 +2,9 @@
 namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
  * @ORM\Table(name="User")
  */
 class User {
@@ -63,7 +64,7 @@ class User {
   /**
    * @param mixed $password
    */
-  public function setDescription($password)
+  public function setPassword($password)
   {
     $this->password = $password;
   }

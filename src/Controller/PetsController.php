@@ -6,7 +6,7 @@ use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Pets;
-use App\Form\PetsType;
+use App\Form\PetType;
 /**
  * Pets controller.
  * @Route("/api", name="api_")
@@ -46,7 +46,7 @@ class PetsController extends AbstractFOSRestController
   public function postPetsAction(Request $request)
   {
     $pet = new Pets();
-    $form = $this->createForm(PetsType::class, $pet);
+    $form = $this->createForm(PetType::class, $pet);
     $data = json_decode($request->getContent(), true);
     $form->submit($data);
     if ($form->isSubmitted() && $form->isValid()) {
@@ -57,6 +57,27 @@ class PetsController extends AbstractFOSRestController
     }
     return $this->handleView($this->view($form->getErrors()));
   }
+  /**
+   * Update Pets.
+   * @Rest\Put("/pet/{pet}")
+   *
+   * @param Pets $pet
+   * 
+   * @return Response
+   */
+   public function putPetsAction(Request $request, Pets $pet)
+   {
+    $form = $this->createForm(PetType::class, $pet);
+    $data = json_decode($request->getContent(), true);
+    $form->submit($data);
+    if ($form->isSubmitted() && $form->isValid()) {
+      $em = $this->getDoctrine()->getManager();
+      $em->persist($pet);
+      $em->flush();
+      return $this->handleView($this->view(['status' => 'ok'], Response::HTTP_CREATED));
+    }
+    return $this->handleView($this->view($form));
+   }
   /**
    * Delete Pet.
    * @Rest\Delete("/pet/{pet}")
@@ -81,36 +102,23 @@ class PetsController extends AbstractFOSRestController
 
     return $this->handleView($this->view(['status' => 'ok'], Response::HTTP_OK));
   }
-
   /**
    * Home page.
-   * @Rest\Get("/home")
+   * @Rest\Get("/pets/random")
    *
    * 
    * @return Response
    */
   public function getRandomPets()
    {
-        $em = $this->getDoctrine()->getManager();
-        $repo = $em->getRepository(Pets::class);
-        $quantity = 5; // We only want 5 rows (however think in increase this value if you have previously removed rows on the table)
+      $em = $this->getDoctrine()->getManager();
+      $repo = $em->getRepository(Pets::class);
+      $quantity = 5;
 
-        // This is the number of rows in the database
-        // You can use another method according to your needs
-        $totalRowsTable = $repo->createQueryBuilder()->select('count(pets.id)')->getQuery()->getSingleScalarResult();// This will be in this case 10 because i have 10 records on this table
-        $numbers = range(1, $totalRowsTable);
-        shuffle($numbers);
-        $random_ids = array_slice($numbers, 0, $quantity);
+      $pets = $repo->findAll();
+      shuffle($pets);
+      $pets = array_slice($pets, 0, $quantity);
 
-        // var_dump($random_ids);
-        // outputs for example:
-        // array(1,5,2,8,3);
-
-        $random_articles = $repo->createQueryBuilder()
-                    ->from('Pets')
-                    ->setParameter('id', $random_ids)
-                    ->setMaxResults(5)// Add this line if you want to give a limit to the records (if all the ids exists then you would like to give a limit)
-                    ->getQuery()
-                    ->getResult();
+      return $this->handleView($this->view($pets), 200);
     }
 }

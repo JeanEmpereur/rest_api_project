@@ -81,4 +81,23 @@ class ProductController extends AbstractFOSRestController
 
     return $this->handleView($this->view(['status' => 'ok'], Response::HTTP_OK));
   }
+  /**
+   * Home page.
+   * @Rest\Get("/product/random")
+   *
+   * 
+   * @return Response
+   */
+  public function getRandomProduct()
+  {
+    $em = $this->getDoctrine()->getManager();
+    $repo = $em->getRepository(Product::class);
+    $quantity = 5;
+
+    $products = $repo->findAll();
+    shuffle($pets);
+    $products = array_slice($products, 0, $quantity);
+
+    return $this->handleView($this->view($products), 200);
+  }
 }
