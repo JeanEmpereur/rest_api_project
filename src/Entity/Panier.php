@@ -72,7 +72,7 @@ class Panier
      */
     public function getUser()
     {
-        return $this->product;
+        return $this->user;
     }
     /**
      * @param User $user

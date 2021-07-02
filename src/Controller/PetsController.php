@@ -128,4 +128,17 @@ class PetsController extends AbstractFOSRestController
 
       return $this->handleView($this->view($pets), Response::HTTP_OK);
     }
+  /**
+   * Home page.
+   * @Rest\Get("/pets/adopte")
+   *
+   * @return Response
+   */
+  public function getAdoptePets()
+  {
+    $em = $this->getDoctrine()->getManager();
+    $pets = $em->getRepository(Pets::class)->findBy(array("date" => "10/10/2021"));
+    
+    return $this->handleView($this->view($pets), Response::HTTP_OK);
+  }
 }

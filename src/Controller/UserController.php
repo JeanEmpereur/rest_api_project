@@ -122,7 +122,7 @@ class UserController extends AbstractFOSRestController
       ];
       $jwt = JWT::encode($payload, $key);
 
-      return $this->handleView($this->view($jwt, Response::HTTP_OK));
+      return $this->handleView($this->view($user, Response::HTTP_OK));
     };
     return $this->handleView($this->view(['status' => 'the user is not marches'], Response::HTTP_NOT_ACCEPTABLE));
   }

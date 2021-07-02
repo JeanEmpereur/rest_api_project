@@ -134,7 +134,7 @@ Responses :
 status 200 OK
 
 GET /panier/{user}
-Afin de récuperer un panier suivant l'id mis en param
+Afin de récuperer un ou plusieurs panier suivant l'id mis en param
 Responses : 
 status 200 OK
 

@@ -5,7 +5,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use App\Entity\Don;
-class PetType extends AbstractType
+class DonType extends AbstractType
 {
   public function buildForm(FormBuilderInterface $builder, array $options)
   {
@@ -19,7 +19,7 @@ class PetType extends AbstractType
   public function configureOptions(OptionsResolver $resolver)
   {
     $resolver->setDefaults(array(
-      'data_class' => Pets::class,
+      'data_class' => Don::class,
       'csrf_protection' => false
     ));
   }

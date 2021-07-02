@@ -3,6 +3,7 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Config\Framework\RateLimiter\LimiterConfig\RateConfig;
+use App\Entity\User;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\PetsRepository")
@@ -177,7 +178,7 @@ class Pets {
    */
   public function getUser()
   {
-    return $this->product;
+    return $this->user;
   }
   /**
    * @param User $user
