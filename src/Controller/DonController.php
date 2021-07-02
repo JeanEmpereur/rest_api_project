@@ -21,8 +21,12 @@ class DonController extends AbstractFOSRestController
    */
   public function getDonAction()
   {
-    $repository = $this->getDoctrine()->getRepository(Don::class);
-    $dons = $repository->findall();
+    try {
+      $repository = $this->getDoctrine()->getRepository(Don::class);
+      $dons = $repository->findall();
+    } catch (\Exception $exception) {
+      return $this->handleView($this->view(['status' => 'Entity Don not found'], Response::HTTP_NOT_FOUND));
+    }
     return $this->handleView($this->view($dons, Response::HTTP_OK));
   }
   /**
@@ -35,7 +39,11 @@ class DonController extends AbstractFOSRestController
    */
   public function getDonbyID(Don $don)
   {
-    return $this->handleView($this->view($don, Response::HTTP_OK));
+    try {
+      return $this->handleView($this->view($don, Response::HTTP_OK));
+    } catch (\Exception $exception) {
+      return $this->handleView($this->view(['status' => 'don not found'], Response::HTTP_NOT_FOUND));
+    }
   }
   /**
    * Create Don.
@@ -50,9 +58,13 @@ class DonController extends AbstractFOSRestController
     $data = json_decode($request->getContent(), true);
     $form->submit($data);
     if ($form->isSubmitted() && $form->isValid()) {
-      $em = $this->getDoctrine()->getManager();
-      $em->persist($don);
-      $em->flush();
+      try {
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($don);
+        $em->flush();
+      } catch (\Exception $exception) {
+        return $this->handleView($this->view(['status' => 'erreur dans l\'ajout d\'un don'], Response::HTTP_NOT_IMPLEMENTED));
+      }
       return $this->handleView($this->view(['status' => 'ok'], Response::HTTP_CREATED));
     }
     return $this->handleView($this->view($form->getErrors(), Response::HTTP_NOT_ACCEPTABLE));

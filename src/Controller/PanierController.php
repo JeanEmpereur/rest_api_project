@@ -22,8 +22,11 @@ class PanierController extends AbstractFOSRestController
      * @return Response
      */
     public function panier() {
-        $panier = $this->getDoctrine()->getRepository(Panier::class)->findAll();
-
+        try {
+            $panier = $this->getDoctrine()->getRepository(Panier::class)->findAll();
+        } catch (\Exception $exception) {
+            return $this->handleView($this->view(['status' => 'Entity Panier not found'], Response::HTTP_NOT_FOUND));
+        }
         return $this->handleView($this->view($panier, Response::HTTP_OK));
     }
     /**
@@ -36,8 +39,11 @@ class PanierController extends AbstractFOSRestController
      */
     public function panierByUser(User $user)
     {
-        $panier = $this->getDoctrine()->getRepository(Panier::class)->findBy(array('user' => $user));
-
+        try {
+            $panier = $this->getDoctrine()->getRepository(Panier::class)->findBy(array('user' => $user));
+        } catch (\Exception $exception) {
+            return $this->handleView($this->view(['status' => 'panier not found'], Response::HTTP_NOT_FOUND));
+        }
         return $this->handleView($this->view($panier, Response::HTTP_OK));
     }
     /**
@@ -50,7 +56,11 @@ class PanierController extends AbstractFOSRestController
     */
     public function getone(Panier $panier)
     {
-        return $this->handleView($this->view($panier, Response::HTTP_OK));
+        try {
+            return $this->handleView($this->view($panier, Response::HTTP_OK));
+        } catch (\Exception $exception) {
+            return $this->handleView($this->view(['status' => 'panier not found'], Response::HTTP_NOT_FOUND));
+        }
     }
     /**
      * Add one product in Panier.
@@ -64,12 +74,16 @@ class PanierController extends AbstractFOSRestController
         $data = json_decode($request->getContent(), true);
         $form->submit($data);
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $panier = $form->getData();
-            $panier->setDateAjout(new \DateTime());
-            $panier->setEtat(True);
-            $em->persist($panier);
-            $em->flush();
+            try {
+                $em = $this->getDoctrine()->getManager();
+                $panier = $form->getData();
+                $panier->setDateAjout(new \DateTime());
+                $panier->setEtat(True);
+                $em->persist($panier);
+                $em->flush();
+            } catch (\Exception $exception) {
+                return $this->handleView($this->view(['status' => 'erreur dans l\'ajout d\'un panier'], Response::HTTP_NOT_IMPLEMENTED));
+            }
 
             return $this->handleView($this->view(['status' => 'ok'], Response::HTTP_CREATED));
         }
@@ -89,9 +103,13 @@ class PanierController extends AbstractFOSRestController
         $data = json_decode($request->getContent(), true);
         $form->submit($data);
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($panier);
-            $em->flush();
+            try {
+                $em = $this->getDoctrine()->getManager();
+                $em->persist($panier);
+                $em->flush();
+            } catch (\Exception $exception) {
+                return $this->handleView($this->view(['status' => 'erreur dans la modification'], Response::HTTP_NOT_MODIFIED));
+            }
             return $this->handleView($this->view(['status' => 'ok'], Response::HTTP_CREATED));
         }
         return $this->handleView($this->view($form), Response::HTTP_OK);

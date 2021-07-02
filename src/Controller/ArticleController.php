@@ -21,8 +21,12 @@ class ArticleController extends AbstractFOSRestController
    */
   public function getArticleAction()
   {
-    $repository = $this->getDoctrine()->getRepository(Article::class);
-    $articles = $repository->findall();
+    try {
+      $repository = $this->getDoctrine()->getRepository(Article::class);
+      $articles = $repository->findall();
+    } catch (\Exception $exception) {
+      return $this->handleView($this->view(['status' => 'Entity article not found'], Response::HTTP_NOT_FOUND));
+    }
     return $this->handleView($this->view($articles, Response::HTTP_OK));
   }
   /**
@@ -35,7 +39,11 @@ class ArticleController extends AbstractFOSRestController
    */
    public function getArticlebyID(Article $article)
    {
-     return $this->handleView($this->view($article, Response::HTTP_OK));
+    try {
+      return $this->handleView($this->view($article, Response::HTTP_OK));
+    } catch (\Exception $exception) {
+      return $this->handleView($this->view(['status' => 'article not found'], Response::HTTP_NOT_FOUND));
+    }
    }
   /**
    * Create Article.
@@ -50,9 +58,13 @@ class ArticleController extends AbstractFOSRestController
     $data = json_decode($request->getContent(), true);
     $form->submit($data);
     if ($form->isSubmitted() && $form->isValid()) {
-      $em = $this->getDoctrine()->getManager();
-      $em->persist($article);
-      $em->flush();
+      try {
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($article);
+        $em->flush();
+      } catch (\Exception $exception) {
+        return $this->handleView($this->view(['status' => 'erreur dans l\'ajout d\'un article'], Response::HTTP_NOT_IMPLEMENTED));
+      }
       return $this->handleView($this->view(['status' => 'ok'], Response::HTTP_CREATED));
     }
     return $this->handleView($this->view($form->getErrors(), Response::HTTP_NOT_ACCEPTABLE));
@@ -71,9 +83,13 @@ class ArticleController extends AbstractFOSRestController
     $data = json_decode($request->getContent(), true);
     $form->submit($data);
     if ($form->isSubmitted() && $form->isValid()) {
-      $em = $this->getDoctrine()->getManager();
-      $em->persist($article);
-      $em->flush();
+      try {
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($article);
+        $em->flush();
+      } catch (\Exception $exception) {
+        return $this->handleView($this->view(['status' => 'erreur dans la modification'], Response::HTTP_NOT_MODIFIED));
+      }
       return $this->handleView($this->view(['status' => 'ok'], Response::HTTP_CREATED));
     }
     return $this->handleView($this->view($form));

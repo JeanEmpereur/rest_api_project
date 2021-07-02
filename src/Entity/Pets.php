@@ -54,7 +54,12 @@ class Pets {
    * @ORM\Column(type="datetime", nullable=true)
    *
    */
-  private $date; 
+  private $date;
+  /**
+   * @ORM\ManyToOne(targetEntity=user::class)
+   * @ORM\JoinColumn(nullable=true)
+   */
+  private $user;
   /**
    * @return mixed
    */
@@ -166,5 +171,21 @@ class Pets {
   public function setDate($date)
   {
     $this->date = $date;
+  }
+  /**
+   * @return User
+   */
+  public function getUser()
+  {
+    return $this->product;
+  }
+  /**
+   * @param User $user
+   */
+  public function setUser($user)
+  {
+    $this->user = $user;
+
+    return $this;
   }
 }

@@ -21,8 +21,12 @@ class ProductController extends AbstractFOSRestController
    */
   public function getProductAction()
   {
-    $repository = $this->getDoctrine()->getRepository(Product::class);
-    $products = $repository->findall();
+    try{
+      $repository = $this->getDoctrine()->getRepository(Product::class);
+      $products = $repository->findall();
+    } catch (\Exception $exception) {
+      return $this->handleView($this->view(['status' => 'Entity Product not found'], Response::HTTP_NOT_FOUND));
+    }
     return $this->handleView($this->view($products, Response::HTTP_OK));
   }
   /**
@@ -35,7 +39,11 @@ class ProductController extends AbstractFOSRestController
    */
   public function getProductbyID(Product $product)
   {
-    return $this->handleView($this->view($product, Response::HTTP_OK));
+    try {
+      return $this->handleView($this->view($product, Response::HTTP_OK));
+    } catch (\Exception $exception) {
+      return $this->handleView($this->view(['status' => 'product not found'], Response::HTTP_NOT_FOUND));
+    }
   }
   /**
    * Create Product.
@@ -50,9 +58,13 @@ class ProductController extends AbstractFOSRestController
     $data = json_decode($request->getContent(), true);
     $form->submit($data);
     if ($form->isSubmitted() && $form->isValid()) {
-      $em = $this->getDoctrine()->getManager();
-      $em->persist($product);
-      $em->flush();
+      try {
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($product);
+        $em->flush();
+      } catch (\Exception $exception) {
+        return $this->handleView($this->view(['status' => 'erreur dans l\'ajout d\'un product'], Response::HTTP_NOT_IMPLEMENTED));
+      }
       return $this->handleView($this->view(['status' => 'ok'], Response::HTTP_CREATED));
     }
     return $this->handleView($this->view($form->getErrors(), Response::HTTP_NOT_ACCEPTABLE));
@@ -71,9 +83,13 @@ class ProductController extends AbstractFOSRestController
     $data = json_decode($request->getContent(), true);
     $form->submit($data);
     if ($form->isSubmitted() && $form->isValid()) {
-      $em = $this->getDoctrine()->getManager();
-      $em->persist($product);
-      $em->flush();
+      try {
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($product);
+        $em->flush();
+      } catch (\Exception $exception) {
+        return $this->handleView($this->view(['status' => 'erreur dans la modification'], Response::HTTP_NOT_MODIFIED));
+      }
       return $this->handleView($this->view(['status' => 'ok'], Response::HTTP_CREATED));
     }
     return $this->handleView($this->view($form), Response::HTTP_OK);

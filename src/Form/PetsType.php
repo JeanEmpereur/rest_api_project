@@ -17,6 +17,7 @@ class PetsType extends AbstractType
       ->add('race')
       ->add('age')
       ->add('date')
+      ->add('user')
       ->add('save', SubmitType::class)
     ;
   }

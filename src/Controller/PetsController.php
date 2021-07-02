@@ -21,8 +21,12 @@ class PetsController extends AbstractFOSRestController
    */
   public function getPets()
   {
-    $repository = $this->getDoctrine()->getRepository(Pets::class);
-    $pets = $repository->findall();
+    try {
+      $repository = $this->getDoctrine()->getRepository(Pets::class);
+      $pets = $repository->findall();
+    } catch (\Exception $exception) {
+      return $this->handleView($this->view(['status' => 'Entity Pets not found'], Response::HTTP_NOT_FOUND));
+    }
     return $this->handleView($this->view($pets, Response::HTTP_OK));
   }
   /**
@@ -35,7 +39,11 @@ class PetsController extends AbstractFOSRestController
    */
    public function getPetbyID(Pets $pet)
    {
-     return $this->handleView($this->view($pet, Response::HTTP_OK));
+    try {
+      return $this->handleView($this->view($pet, Response::HTTP_OK));
+    } catch (\Exception $exception) {
+      return $this->handleView($this->view(['status' => 'pet not found'], Response::HTTP_NOT_FOUND));
+    }
    }
   /**
    * Create Pets.

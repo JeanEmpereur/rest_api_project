@@ -22,8 +22,12 @@ class UserController extends AbstractFOSRestController
    */
   public function getUserAction()
   {
-    $repository = $this->getDoctrine()->getRepository(User::class);
-    $users = $repository->findall();
+    try{
+      $repository = $this->getDoctrine()->getRepository(User::class);
+      $users = $repository->findall();
+    } catch (\Exception $exception) {
+      return $this->handleView($this->view(['status' => 'Entity User not found'], Response::HTTP_NOT_FOUND));
+    }
     return $this->handleView($this->view($users, Response::HTTP_OK));
   }
   /**
@@ -36,7 +40,11 @@ class UserController extends AbstractFOSRestController
    */
   public function getUserbyID(User $user)
   {
-    return $this->handleView($this->view($user, Response::HTTP_OK));
+    try {
+      return $this->handleView($this->view($user, Response::HTTP_OK));
+    } catch (\Exception $exception) {
+      return $this->handleView($this->view(['status' => 'user not found'], Response::HTTP_NOT_FOUND));
+    }
   }
   /**
    * Create User.
@@ -51,9 +59,13 @@ class UserController extends AbstractFOSRestController
     $data = json_decode($request->getContent(), true);
     $form->submit($data);
     if ($form->isSubmitted() && $form->isValid()) {
-      $em = $this->getDoctrine()->getManager();
-      $em->persist($user);
-      $em->flush();
+      try {
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($user);
+        $em->flush();
+      } catch (\Exception $exception) {
+        return $this->handleView($this->view(['status' => 'erreur dans l\'ajout d\'un user'], Response::HTTP_NOT_IMPLEMENTED));
+      }
       return $this->handleView($this->view(['status' => 'ok'], Response::HTTP_CREATED));
     }
     return $this->handleView($this->view($form->getErrors(), Response::HTTP_NOT_ACCEPTABLE));
@@ -72,9 +84,13 @@ class UserController extends AbstractFOSRestController
     $data = json_decode($request->getContent(), true);
     $form->submit($data);
     if ($form->isSubmitted() && $form->isValid()) {
-      $em = $this->getDoctrine()->getManager();
-      $em->persist($user);
-      $em->flush();
+      try{
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($user);
+        $em->flush();
+      } catch (\Exception $exception) {
+        return $this->handleView($this->view(['status' => 'erreur dans la modification'], Response::HTTP_NOT_MODIFIED));
+      }
       return $this->handleView($this->view(['status' => 'ok'], Response::HTTP_CREATED));
     }
     return $this->handleView($this->view($form, Response::HTTP_OK));
@@ -105,8 +121,54 @@ class UserController extends AbstractFOSRestController
         "exp" => $ts
       ];
       $jwt = JWT::encode($payload, $key);
+
       return $this->handleView($this->view($jwt, Response::HTTP_OK));
     };
-    return $this->handleView($this->view(['status' => 'not ok'], Response::HTTP_NOT_ACCEPTABLE));
+    return $this->handleView($this->view(['status' => 'the user is not marches'], Response::HTTP_NOT_ACCEPTABLE));
   }
+  /**
+   * Delete User.
+   * @Rest\Delete("/user/{user}")
+   *
+   * @param User $user
+   *
+   * @return JsonResponse
+   */
+  public function deletePanier(User $user)
+  {
+
+    if (false === !!$user) {
+      return $this->handleView($this->view(['status' => 'not ok'], Response::HTTP_NOT_FOUND));
+    }
+    try {
+      $em = $this->getDoctrine()->getManager();
+      $em->remove($user);
+      $em->flush();
+    } catch (\Exception $exception) {
+      return $this->handleView($this->view(['status' => 'erreur dans la suppression'], Response::HTTP_NOT_MODIFIED));
+    }
+
+    return $this->handleView($this->view(['status' => 'ok'], Response::HTTP_OK));
+   }
+   /**
+    * Home page.
+    * @Rest\Get("/users/random")
+    *
+    * @return Response
+    */
+   public function getRandomUsers()
+    {
+       $em = $this->getDoctrine()->getManager();
+       $repo = $em->getRepository(Users::class);
+       $quantity = 5;
+ 
+       $users = $repo->findAll();
+       shuffle($users);
+       $users = array_slice($users, 0, $quantity);
+ 
+       return $this->handleView($this->view($users), Response::HTTP_OK);
+     }
+
+     
+
 }
